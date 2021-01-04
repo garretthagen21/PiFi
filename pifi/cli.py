@@ -9,7 +9,6 @@ from pifi.utils import print_table, match as fuzzy_match
 from pifi.exceptions import ConnectionError, InterfaceError
 
 
-
 def fuzzy_find_cell(interface, query):
     match_partial = lambda cell: fuzzy_match(query, cell.ssid)
 
@@ -36,24 +35,25 @@ def find_cell(interface, query):
     return cell
 
 
-def get_network_params(interface, ssid,name=None):
-    cell = find_cell(interface,ssid or name)
+def get_network_params(interface, ssid, name=None):
+    cell = find_cell(interface, ssid or name)
     passkey = None if not cell.encrypted else input('passkey> ')
 
-    return cell, passkey, name, None
+    return cell, passkey, name, None, interface
 
 
 def scan_command(args):
-    print_table([[cell.signal, cell.ssid, 'protected' if cell.encrypted else 'unprotected'] for cell in Cell.all(args.interface)])
+    print_table([[cell.signal, cell.ssid, 'protected' if cell.encrypted else 'unprotected'] for cell in
+                 Cell.all(args.interface)])
 
 
 def list_command(args):
     for network in Network.for_file(args.file).all():
-        print(network.name)
+        print(network.ssid)
 
 
 def show_command(args):
-    network = Network.for_file(args.file).for_cell(*get_network_params(args.interface, args.ssid))
+    network = Network.for_file(args.file).for_cell(*get_network_params(args.interface, args.ssid, args.network))
     print(network)
 
 
@@ -67,17 +67,13 @@ def add_command(args):
 
 def connect_command(args):
     network_class = Network.for_file(args.file)
-    if args.adhoc:
-        network = network_class.for_cell(*get_network_params(args.interface, args.ssid, 'adhoc'))
-        network.save()
-    else:
-        network = network_class.find(args.ssid)
-        assert network, "Couldn't find a network named {0!r}, did you mean to use -a?".format(args.ssid)
+    network = network_class.find(args.ssid)
+    assert network, "Couldn't find a network named {0!r}, did you mean to use -a?".format(args.ssid)
 
     try:
         network.activate()
     except ConnectionError:
-        assert False, "Failed to connect to %s." % network.name
+        assert False, "Failed to connect to %s." % network.ssid
 
 
 def autoconnect_command(args):
@@ -117,20 +113,20 @@ def arg_parser():
     parser_list.set_defaults(func=list_command)
 
     network_help = ("A memorable nickname for a wireless network."
-                   "  If SSID is not provided, the network will be guessed using NETWORK.")
+                    "  If SSID is not provided, the network will be guessed using NETWORK.")
     ssid_help = ("The SSID for the network to which you wish to connect."
                  "  This is fuzzy matched, so you don't have to be precise.")
 
     parser_show = subparsers.add_parser('config',
                                         help="Prints the configuration to connect to a new network.")
-    parser_show.add_argument('network', help=network_help, metavar='NETWORK')
     parser_show.add_argument('ssid', help=ssid_help, metavar='SSID')
+    parser_show.add_argument('network', help=network_help, metavar='NETWORK')
     parser_show.set_defaults(func=show_command)
 
     parser_add = subparsers.add_parser('add',
                                        help="Adds the configuration to connect to a new network.")
-    parser_add.add_argument('network', help=network_help, metavar='NETWORK')
     parser_add.add_argument('ssid', help=ssid_help, metavar='SSID')
+    parser_add.add_argument('network', help=network_help, metavar='NETWORK')
     parser_add.set_defaults(func=add_command)
 
     parser_connect = subparsers.add_parser('connect',

@@ -32,8 +32,6 @@ class Connection(object):
 
 
 class Network(object):
-
-
     """Represents a single network block in wpa_supplicant.conf."""
 
     WPA_SUPPLICANT_CONFIG = "/etc/wpa_supplicant/wpa_supplicant.conf"
@@ -50,12 +48,10 @@ class Network(object):
             'WPA_SUPPLICANT_CONFIG': wpa_supplicant_config,
         })
 
-
     def __init__(self, ssid, **opts):
         self.ssid = ssid
         self.opts = opts
         self.interface = Network.DEFAULT_INTERFACE
-
 
     def __repr__(self):
         string = 'network={\n'
@@ -65,7 +61,7 @@ class Network(object):
         string += '}'
         return string
 
-    def set_interface(self,interface):
+    def set_interface(self, interface):
         self.interface = interface
 
     def save(self, overwrite=True, supplicant_file=WPA_SUPPLICANT_CONFIG):
@@ -238,11 +234,12 @@ class Network(object):
         return networks
 
     @classmethod
-    def new_network(cls, ssid, passkey="", is_open=False, id_str=None, priority=None,interface=DEFAULT_INTERFACE):
+    def new_network(cls, ssid, passkey="", is_open=False, id_str=None, priority=None, interface=DEFAULT_INTERFACE):
         network = cls(ssid)
         key_mgmt_type = "NONE"
         if not is_open:
             # check passphrase length
+            key_mgmt_type = "WPA-PSK"
             l = len(passkey)
             if l < 8 or l > 63:
                 print("Passphrase must be 8..63 characters.")
@@ -254,10 +251,9 @@ class Network(object):
         if id_str: network.add_option("id_str", id_str)
         if priority: network.add_option("priority", priority)
 
-
         return network
 
     @classmethod
-    def for_cell(cls, cell, passkey="", id_str="", priority=None):
+    def for_cell(cls, cell, passkey="", id_str="", priority=None, interface=DEFAULT_INTERFACE):
         return cls.new_network(cell.ssid, passkey=passkey, is_open=(not cell.encrypted), id_str=id_str,
-                               priority=priority)
+                               priority=priority, interface=interface)
