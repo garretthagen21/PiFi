@@ -20,51 +20,52 @@ WPA_SUPP_CONFIG_CONTENTS = """
      psk="TestPass1"
      key_mgmt=WPA-PSK
      priority=1
-     id_str=SSID_BASIC
+     id_str="SSID_BASIC"
     }
     
     network={
      ssid="TestSSID2"
      psk="TestPass2"
      priority=5
-     id_str=SSID_NO_KEY_MGMT
+     id_str="SSID_NO_KEY_MGMT"
     }
     
     network={
      ssid="TestSSID3"
      key_mgmt=NONE
-     id_str=SSID_NO_PSK
+     id_str="SSID_NO_PSK"
     }
     
     network={
      ssid="TestSSID4"
      psk="TestPass4"
      key_mgmt=WPA-PSK
-     id_str=SSID_NO_PRIORITY
+     id_str="SID_NO_PRIORITY"
     }
     
     network={
-     ssid="TestSSID5"
+     ssid="Test-SSID5"
      psk="TestPass1"
      key_mgmt=WPA-PSK
      priority=3
      proto=wpa2
-     id_str=SSID_PROTO
+     id_str="SID_PROTO"
     }
     
-     network={
-     ssid="TestSSID6"
+    network={
+     ssid="Test SSID6"
      
      psk="TestPass6"
      key_mgmt=WPA-PSK
      
      priority=4
      proto=wpa2
-     id_str=SSID_SPACES
+     id_str="SSID_SPACES"
     
     }
 """
 
+# TODO: This needs more extensive test cases
 
 class TestNetworks(TestCase):
     def setUp(self):
@@ -74,55 +75,42 @@ class TestNetworks(TestCase):
         with open(self.file_path, 'w') as f:
             f.write(WPA_SUPP_CONFIG_CONTENTS)
 
-        self.network = Network.for_file(self.file_path)
+        self.Network = Network.for_file(self.file_path)
 
     def tearDown(self):
-        os.remove(self.network.WPA_SUPPLICANT_CONFIG)
+        os.remove(self.Network.WPA_SUPPLICANT_CONFIG)
 
     def test_network_extraction(self):
-        work, coffee, home, coffee2 = list(self.network.all())[:4]
+        all_networks = self.Network.all()
+        assert len(all_networks) == 6
+        for network in all_networks:
+            assert network is not None
 
-        assert work.ssid == 'work'
-        assert work.opts["p"]
 
-        assert coffee.name == 'coffee'
-        assert coffee.options['wireless-essid'] == 'Coffee WiFi'
 
     def test_with_hyphen(self):
-        with_hyphen = self.Network.find('wlan0', 'with-hyphen')
-        assert with_hyphen.options['wireless-essid'] == 'with-hyphen'
+        network_with_hyphen = self.Network.find("Test SSID6")
+        assert network_with_hyphen is not None
+        assert network_with_hyphen.ssid == "Test-SSID5"
 
-    def test_with_different_interface(self):
-        assert self.Network.find('xyz1', 'network')
+    def test_with_space(self):
+        network_with_hyphen = self.Network.find("Test-SSID5")
+        assert network_with_hyphen is not None
+        assert network_with_hyphen.ssid == "Test SSID6"
 
-    def test_str(self):
-        network = self.Network('wlan0', 'test')
-        assert str(network) == 'iface wlan0-test inet dhcp\n'
 
-        network = self.Network('wlan0', 'test', {
-            'wpa-ssid': 'workwifi',
-        })
-
-        self.assertEqual(str(network), 'iface wlan0-test inet dhcp\n    wpa-ssid workwifi\n')
-
-    def test_find(self):
-        work = self.Network.find('wlan0', 'work')
-
-        assert work.options['wpa-ssid'] == 'workwifi'
 
     def test_delete(self):
-        work = self.Network.find('wlan0', 'work')
-        work.delete()
-        self.assertIsNone(self.Network.find('wlan0', 'work'))
-        assert self.Network.find('wlan0', 'coffee')
+        delete_net = self.Network.find("TestSSID1")
+        delete_net.delete()
+        self.assertIsNone(self.Network.find("TestSSID1"))
 
     def test_save(self):
-        network = self.Network('wlan0', 'test')
+        network = self.Network('test_save')
         network.save()
+        assert self.Network.find('test_save')
 
-        assert self.Network.find('wlan0', 'test')
-
-
+"""
 class TestActivation(TestCase):
     def test_successful_connection(self):
         network = Network('wlan0', 'test')
@@ -207,7 +195,7 @@ class TestForCell(TestCase):
             'wpa-psk': 'ea1548d4e8850c8d94c5ef9ed6fe483981b64c1436952cb1bf80c08a68cdc763',
             'wireless-channel': 'auto',
         })
-
+"""
 
 
 SUCCESSFUL_IFDOWN_OUTPUT = """Internet Systems Consortium DHCP Client 4.2.4
