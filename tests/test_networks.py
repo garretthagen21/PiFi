@@ -70,7 +70,6 @@ WPA_SUPP_CONFIG_CONTENTS = """
 class TestNetworks(TestCase):
     def setUp(self):
         self.tempfile, self.file_path = tempfile.mkstemp()
-        self.tempfile.close()
 
         with open(self.file_path, 'w') as f:
             f.write(WPA_SUPP_CONFIG_CONTENTS)
