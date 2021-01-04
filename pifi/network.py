@@ -30,6 +30,9 @@ class Connection(object):
         self.network = network
         self.ip_address = ip_address
 
+    def __repr__(self):
+        return "IP Address: "+self.ip_address+"\n"+"Network: \n"+str(self.network)
+
 
 class Network(object):
     """Represents a single network block in wpa_supplicant.conf."""
@@ -145,6 +148,9 @@ class Network(object):
             # Overwrite the actual file with the temp file
             subprocess.check_output(['mv', wpa_supplicant_temp_file, supplicant_file])
 
+            # Reload wpa client in case we deleted the network we were connected to
+            self._reload_wpa_client()
+
             return True
         else:
             print("Could Not Find Entry for Network: " + self.ssid + " in " + supplicant_file)
@@ -160,12 +166,9 @@ class Network(object):
         # Save file if it does not exist
         self.save(overwrite=True)
 
-        # Restart connection management
-        subprocess.check_output(['ifconfig', self.interface, 'up'])
-        wpa_cli_output = subprocess.check_output(['wpa_cli', '-i', self.interface, 'reconfigure'],
-                                                 stderr=subprocess.STDOUT).decode('utf-8')
 
-        if 'OK' not in wpa_cli_output:
+
+        if 'OK' not in self._reload_wpa_client():
             raise ConnectionError("An error occured during wpa_cli reconfigure %r" % self)
 
     def get_connection_data(self):
@@ -176,6 +179,14 @@ class Network(object):
                 return Connection(network=self, ip_address=ip_address)
 
         raise ConnectionError("Failed to connect to %r" % self)
+
+    def _reload_wpa_client(self):
+        # Restart connection management
+        subprocess.check_output(['ifconfig', self.interface, 'up'])
+        wpa_cli_output = subprocess.check_output(['wpa_cli', '-i', self.interface, 'reconfigure'],
+                                                 stderr=subprocess.STDOUT).decode('utf-8')
+        return wpa_cli_output
+
 
     @classmethod
     def from_string(cls, string):

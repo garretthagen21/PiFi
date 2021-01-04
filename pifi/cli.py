@@ -72,8 +72,20 @@ def connect_command(args):
 
     try:
         network.activate()
+        print(network.get_connection_data())
     except ConnectionError:
         assert False, "Failed to connect to %s." % network.ssid
+
+def delete_command(args):
+    network_class = Network.for_file(args.file)
+    network = network_class.find(args.ssid)
+    assert network, "Couldn't find a network named {0!r}".format(args.ssid)
+
+    if network.delete():
+        print("Successfully deleted network: "+network)
+    else:
+        print("Failed to delete network: "+network)
+   
 
 
 def autoconnect_command(args):
@@ -117,8 +129,7 @@ def arg_parser():
     ssid_help = ("The SSID for the network to which you wish to connect."
                  "  This is fuzzy matched, so you don't have to be precise.")
 
-    parser_show = subparsers.add_parser('config',
-                                        help="Prints the configuration to connect to a new network.")
+    parser_show = subparsers.add_parser('config',help="Dry run print the configuration to connect to a new network.")
     parser_show.add_argument('ssid', help=ssid_help, metavar='SSID')
     parser_show.add_argument('network', help=network_help, metavar='NETWORK')
     parser_show.set_defaults(func=show_command)
@@ -128,6 +139,11 @@ def arg_parser():
     parser_add.add_argument('ssid', help=ssid_help, metavar='SSID')
     parser_add.add_argument('network', help=network_help, metavar='NETWORK')
     parser_add.set_defaults(func=add_command)
+
+    parser_delete = subparsers.add_parser('delete',
+                                       help="Deletes a network that is currently configured.")
+    parser_delete.add_argument('ssid', help=ssid_help, metavar='SSID')
+    parser_delete.set_defaults(func=delete_command)
 
     parser_connect = subparsers.add_parser('connect',
                                            help="Connects to the network corresponding to NETWORK")
