@@ -15,23 +15,7 @@
 from __future__ import print_function
 
 import subprocess
-import os
-
-WPA_SUPPLICANT_CONFIG = "/etc/wpa_supplicant/wpa_supplicant.conf"
-WPA_SUPPLICANT_CONFIG_TEMP = "/etc/wpa_supplicant/wpa_supplicant.conf.tmp"
-
-
-class Connection(object):
-    """
-    The connection object returned when connecting to a Scheme.
-    """
-
-    def __init__(self, network, ip_address):
-        self.network = network
-        self.ip_address = ip_address
-
-    def __repr__(self):
-        return "IP Address: "+self.ip_address+"\n"+"Network: \n"+str(self.network)
+from ifconfigparser import IfconfigParser
 
 
 class Network(object):
@@ -87,11 +71,10 @@ class Network(object):
             else:
                 existing_network.delete()
 
-
         # Save the file
         with open(supplicant_file, 'a') as wpa_config:
             wpa_config.write('\n')
-            #wpa_config.write('\n# This Network Entry was Automatically Created by wpa-pifi Python Module #\n')
+            # wpa_config.write('\n# This Network Entry was Automatically Created by wpa-pifi Python Module #\n')
             wpa_config.write(str(self))
             wpa_config.write('\n')
 
@@ -136,8 +119,8 @@ class Network(object):
             # End index is calculated inclusively, but sliced exclusively so add 1
             entry_end_index = min(entry_end_index + 1, len(all_lines))
 
-            print("Removing Lines from Index: " + str(entry_start_index) + " to " + str(entry_end_index) + "\n\n")
-            print(''.join(all_lines[entry_start_index:entry_end_index]))
+            # print("Removing Lines from Index: " + str(entry_start_index) + " to " + str(entry_end_index) + "\n\n")
+            # print(''.join(all_lines[entry_start_index:entry_end_index]))
 
             # Remove the entry from all lines
             all_lines = all_lines[:entry_start_index] + all_lines[entry_end_index:]
@@ -145,8 +128,8 @@ class Network(object):
             # Piece the list back together
             wpa_supplicant_temp_file = supplicant_file + ".tmp"
             file_output = ''.join(all_lines)
-            print("Writing Contents To Tempfile: " + wpa_supplicant_temp_file + "\n\n")
-            print(file_output)
+            # print("Writing Contents To Tempfile: " + wpa_supplicant_temp_file + "\n\n")
+            # print(file_output)
             temp_file = open(wpa_supplicant_temp_file, 'w')
             temp_file.write(file_output)
             temp_file.close()
@@ -165,24 +148,27 @@ class Network(object):
     def add_option(self, option_key, option_value):
         self.opts[option_key] = option_value
 
-    def activate(self):
+    def activate(self, save_first=True):
         """
         Connects to the network as configured in this scheme.
         """
         # Save file if it does not exist
-        self.save(overwrite=True)
+        if save_first:
+            self.save(overwrite=True)
+
         output = self._reload_wpa_client()
         if 'OK' not in output:
-            raise ConnectionError("An error occured during wpa_cli reconfigure %r\n\nwpa_cli Output:"+output % self)
+            raise ConnectionError("An error occured during wpa_cli reconfigure %r\n\nwpa_cli Output:" + output % self)
 
     def get_connection_data(self):
-        ifconfig_output = subprocess.check_output(['ifconfig', self.interface])
-        for l in ifconfig_output.split('\n'):
-            if l.strip().startswith("inet addr:"):
-                ip_address = l.strip().split(' ')[1].split(':')[1]
-                return Connection(network=self, ip_address=ip_address)
-
-        raise ConnectionError("Failed to connect to %r" % self)
+        ifconfig_output = subprocess.check_output(['ifconfig'])
+        ifconfig_parse = IfconfigParser(console_output=ifconfig_output)
+        try:
+            return ifconfig_parse.get_interface(self.interface)
+        except Exception as e:
+            print("An error occured looking for interface: " + self.interface)
+            print("Stack trace: " + str(e))
+            return None
 
     def _reload_wpa_client(self):
         # Restart connection management
@@ -190,7 +176,6 @@ class Network(object):
         wpa_cli_output = subprocess.check_output(['wpa_cli', '-i', self.interface, 'reconfigure'],
                                                  stderr=subprocess.STDOUT).decode('utf-8')
         return wpa_cli_output
-
 
     @classmethod
     def from_string(cls, string):
@@ -255,8 +240,8 @@ class Network(object):
         if not is_open:
             # check passphrase length
             key_mgmt_type = "WPA-PSK"
-            l = len(passkey)
-            if l < 8 or l > 63:
+            pass_len = len(passkey)
+            if pass_len < 8 or pass_len > 63:
                 print("Passphrase must be 8..63 characters.")
             network.opts["psk"] = '"{}"'.format(passkey)
 

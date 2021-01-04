@@ -15,7 +15,8 @@ def read(fname):
 
 
 install_requires = [
-    'setuptools'
+    'setuptools',
+    'ifconfig-parser'
 ]
 try:
     import argparse
