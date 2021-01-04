@@ -82,10 +82,10 @@ def delete_command(args):
     assert network, "Couldn't find a network named {0!r}".format(args.ssid)
 
     if network.delete():
-        print("Successfully deleted network: "+network)
+        print("Successfully deleted network: "+str(network))
     else:
-        print("Failed to delete network: "+network)
-   
+        print("Failed to delete network: "+str(network))
+
 
 
 def autoconnect_command(args):

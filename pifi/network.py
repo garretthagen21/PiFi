@@ -77,15 +77,21 @@ class Network(object):
                 Defaults to WPA_SUPPLICANT_CONFIG (global setting).
 
         """
-        if Network.find(self.ssid) and not overwrite:
-            print("Network: " + str(
-                self) + " already exists in " + supplicant_file + " and overwrite is False. Ignoring save")
-            return
+        # Handle any existing networks
+        existing_network = Network.find(self.ssid)
+        if existing_network:
+            if not overwrite:
+                print("Network: " + str(
+                    self) + " already exists in " + supplicant_file + " and overwrite is False. Ignoring save")
+                return
+            else:
+                existing_network.delete()
 
-        # Otherwise save the file
+
+        # Save the file
         with open(supplicant_file, 'a') as wpa_config:
             wpa_config.write('\n')
-            # wpa_config.write('\n# This Network Entry was Automatically Created by wpa-pifi Python Module #\n')
+            #wpa_config.write('\n# This Network Entry was Automatically Created by wpa-pifi Python Module #\n')
             wpa_config.write(str(self))
             wpa_config.write('\n')
 
@@ -165,11 +171,9 @@ class Network(object):
         """
         # Save file if it does not exist
         self.save(overwrite=True)
-
-
-
-        if 'OK' not in self._reload_wpa_client():
-            raise ConnectionError("An error occured during wpa_cli reconfigure %r" % self)
+        output = self._reload_wpa_client()
+        if 'OK' not in output:
+            raise ConnectionError("An error occured during wpa_cli reconfigure %r\n\nwpa_cli Output:"+output % self)
 
     def get_connection_data(self):
         ifconfig_output = subprocess.check_output(['ifconfig', self.interface])
@@ -259,7 +263,7 @@ class Network(object):
         # Add option params
         network.set_interface(interface)
         network.add_option("key_mgmt", key_mgmt_type)
-        if id_str: network.add_option("id_str", id_str)
+        if id_str: network.add_option("id_str", '"{}"'.format(id_str))
         if priority: network.add_option("priority", priority)
 
         return network
