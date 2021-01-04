@@ -52,7 +52,7 @@ class Network(object):
     def set_interface(self, interface):
         self.interface = interface
 
-    def save(self, overwrite=True, supplicant_file=WPA_SUPPLICANT_CONFIG):
+    def save(self, overwrite=True, supplicant_file=None):
         u"""Write to the appropriate config file.
         Will refuse to overwrite an already present file unless explicitly told
         to do so via the 'overwrite' parameter.
@@ -62,6 +62,10 @@ class Network(object):
                 Defaults to WPA_SUPPLICANT_CONFIG (global setting).
 
         """
+
+        # Set to default config if unspecified
+        if not supplicant_file: supplicant_file = self.WPA_SUPPLICANT_CONFIG
+
         # Handle any existing networks
         existing_network = Network.find(self.ssid)
         if existing_network:
@@ -79,10 +83,13 @@ class Network(object):
             wpa_config.write(str(self))
             wpa_config.write('\n')
 
-    def delete(self, supplicant_file=WPA_SUPPLICANT_CONFIG):
+    def delete(self, supplicant_file=None):
         """
         Deletes the configuration from the :attr:`interfaces` file.
         """
+
+        # Set to default config if unspecified
+        if not supplicant_file: supplicant_file = self.WPA_SUPPLICANT_CONFIG
 
         # Read in the contents of supplicant conf
         file_in = open(supplicant_file, 'r')
@@ -199,7 +206,11 @@ class Network(object):
         return cls(ssid, **opts)
 
     @classmethod
-    def find(cls, ssid, name=None,supplicant_file=WPA_SUPPLICANT_CONFIG):
+    def find(cls, ssid, name=None,supplicant_file=None):
+
+        # Set to default config if unspecified
+        if not supplicant_file: supplicant_file = cls.WPA_SUPPLICANT_CONFIG
+
         all_networks = cls.all(supplicant_file)
         # First try ssid
         for network in all_networks:
@@ -213,10 +224,13 @@ class Network(object):
         return None
 
     @classmethod
-    def all(cls, supplicant_file=WPA_SUPPLICANT_CONFIG):
+    def all(cls, supplicant_file=None):
         """Extract all network blocks from a file.
         Returns a list of Network objects.
         """
+        # Set to default config if unspecified
+        if not supplicant_file: supplicant_file = cls.WPA_SUPPLICANT_CONFIG
+
         with open(supplicant_file) as netfile:
             config = netfile.read()
         networks = []
