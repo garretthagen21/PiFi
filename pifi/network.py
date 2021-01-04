@@ -37,10 +37,10 @@ class Network(object):
     """Represents a single network block in wpa_supplicant.conf."""
 
     WPA_SUPPLICANT_CONFIG = "/etc/wpa_supplicant/wpa_supplicant.conf"
-    INTERFACE = 'wlan0'
+    DEFAULT_INTERFACE = 'wlan0'
 
     @classmethod
-    def for_file(cls, wpa_supplicant_config,interface=INTERFACE):
+    def for_file(cls, wpa_supplicant_config):
         """
         A class factory for providing a nice way to specify the interfaces file
         that you want to use.  Use this instead of directly overwriting the
@@ -48,13 +48,13 @@ class Network(object):
         """
         return type(cls)(cls.__name__, (cls,), {
             'WPA_SUPPLICANT_CONFIG': wpa_supplicant_config,
-            'INTERFACE': interface,
         })
 
 
     def __init__(self, ssid, **opts):
         self.ssid = ssid
         self.opts = opts
+        self.interface = Network.DEFAULT_INTERFACE
 
 
     def __repr__(self):
@@ -64,6 +64,9 @@ class Network(object):
             string += '\t{}={}\n'.format(opt, val)
         string += '}'
         return string
+
+    def set_interface(self,interface):
+        self.interface = interface
 
     def save(self, overwrite=True, supplicant_file=WPA_SUPPLICANT_CONFIG):
         u"""Write to the appropriate config file.
@@ -162,15 +165,15 @@ class Network(object):
         self.save(overwrite=True)
 
         # Restart connection management
-        subprocess.check_output(['ifconfig', Network.INTERFACE, 'up'])
-        wpa_cli_output = subprocess.check_output(['wpa_cli', '-i', Network.INTERFACE, 'reconfigure'],
+        subprocess.check_output(['ifconfig', self.interface, 'up'])
+        wpa_cli_output = subprocess.check_output(['wpa_cli', '-i', self.interface, 'reconfigure'],
                                                  stderr=subprocess.STDOUT).decode('utf-8')
 
         if 'OK' not in wpa_cli_output:
             raise ConnectionError("An error occured during wpa_cli reconfigure %r" % self)
 
     def get_connection_data(self):
-        ifconfig_output = subprocess.check_output(['ifconfig', Network.INTERFACE])
+        ifconfig_output = subprocess.check_output(['ifconfig', self.interface])
         for l in ifconfig_output.split('\n'):
             if l.strip().startswith("inet addr:"):
                 ip_address = l.strip().split(' ')[1].split(':')[1]
@@ -235,7 +238,7 @@ class Network(object):
         return networks
 
     @classmethod
-    def new_network(cls, ssid, passkey="", is_open=False, id_str=None, priority=None):
+    def new_network(cls, ssid, passkey="", is_open=False, id_str=None, priority=None,interface=DEFAULT_INTERFACE):
         network = cls(ssid)
         key_mgmt_type = "NONE"
         if not is_open:
@@ -246,9 +249,11 @@ class Network(object):
             network.opts["psk"] = '"{}"'.format(passkey)
 
         # Add option params
+        network.set_interface(interface)
         network.add_option("key_mgmt", key_mgmt_type)
         if id_str: network.add_option("id_str", id_str)
         if priority: network.add_option("priority", priority)
+
 
         return network
 

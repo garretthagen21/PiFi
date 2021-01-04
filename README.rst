@@ -1,28 +1,19 @@
-**Note:** This project is unmaintained. While I would love to keep up the
-development on this project, it is difficult for me for several reasons:
 
-1.  I don't have enough time.
-
-2.  I switched to Fedora and the corresponding scripts to manage WiFi are
-    completely different. I was looking into re-writing the library in order to
-    support more than just Debian based architectures, but it was too involved.
-
-If anybody wants to take over the development of WiFi, please contact me. You
-can find my email in the commit message.
+**Note** PiFi is based off of the archived Wifi library originally created by Rocky Meza: https://travis-ci.org/rockymeza/wifi
 
 ----
 
-wifi
+PiFi
 ----
 
-Wifi provides a command line wrapper for iwlist and /etc/network/interfaces
-that makes it easier to connect the WiFi networks from the command line.  The
-wifi command is also implemented as a library that can be used from Python.
+pifi provides a command line wrapper for iwlist and /etc/wpa_supplicant/wpa_supplicant.conf
+that makes it easier to connect the WiFi networks from the command line, specifically on a
+a Raspberry Pi Device. The pifi command is also implemented as a library that can be used from Python.
 
 ::
 
-    # pip install wifi
-    # wifi --help
+    # pip install pifi
+    # pifi --help
 
 
 .. image:: https://travis-ci.org/rockymeza/wifi.png?branch=master

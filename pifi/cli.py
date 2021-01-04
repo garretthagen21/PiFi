@@ -37,7 +37,7 @@ def find_cell(interface, query):
 
 
 def get_network_params(interface, ssid,name=None):
-    cell = find_cell(interface,ssid)
+    cell = find_cell(interface,ssid or name)
     passkey = None if not cell.encrypted else input('passkey> ')
 
     return cell, passkey, name, None
