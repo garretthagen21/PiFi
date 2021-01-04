@@ -1,5 +1,17 @@
 Changelog
 =========
+0.5.0
+^^^^^
+:release-date: unknown
+
+- Packaged renamed from wifi to pifi
+- Project was rebuilt to run on wpa_cli instead of ifup and ifdown (a noteable issue for RPi Users)
+- Scheme class was replaced with Network class
+- Configurations are saved by default in /etc/wpa_supplicant/wpa_supplicant.conf instead of /etc/networks/interfaces (previous)
+- Ad hoc network connection via CLI is no longer supported
+- Connection class is no longer utilized. IfConfigParser object is used instead to view connection information
+- Network tests are currently broken
+- Discontinued support for Python3
 
 0.4.0
 ^^^^^

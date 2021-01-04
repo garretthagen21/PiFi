@@ -111,32 +111,25 @@ Shows a list of networks already configured. ::
 
     usage: pifi list
 
-add, config
------------
+add, config, connect
+--------------------
 
 Prints or adds the configuration to connect to a new network. ::
 
-    usage: pifi config NETWORK [SSID]
-    usage: pifi add NETWORK [SSID]
+    usage: pifi config SSID [NETNAME]
+    usage: pifi add SSID [NETNAME]
+    usage: pifi connect SSID [NETNAME]
 
     positional arguments:
-      NETWORK     A memorable nickname for a wireless network. If SSID is not
-                  provided, the network will be guessed using NETWORK.
+
       SSID        The SSID for the network to which you wish to connect. This is
                   fuzzy matched, so you don't have to be precise.
+      NETNAME     A memorable nickname for a wireless network. If SSID is not
+                  provided, the network will be guessed using NETNAME.
 
-connect
--------
 
-Connects to the network corresponding to NETWORK. ::
 
-    usage: pifi connect [-a] NETWORK
 
-    positional arguments:
-      NETWORK        The nickname of the network to which you wish to connect.
-
-    optional arguments:
-      -a, --ad-hoc  Connect to a network without storing it in the config file
 
 autoconnect
 -----------

@@ -1,7 +1,7 @@
 Managing WiFi networks
 ======================
 
-.. currentmodule:: wifi
+.. currentmodule:: pifi
 
 Discovering networks
 --------------------
@@ -9,7 +9,7 @@ Discovering networks
 You can use this library to scan for networks that are available in the air.
 To get a list of the different cells in the area, you can do ::
 
-    >>> from wifi import Cell, Scheme
+    >>> from pifi import Cell, Network
     >>> Cell.all('wlan0')
 
 This returns a list of :class:`Cell` objects.  Under the hood, this calls `iwlist scan` and parses the unfriendly output.
@@ -39,28 +39,28 @@ For cells that have :attr:`encrypted` as `True`, there will also be the followin
 Connecting to a network
 -----------------------
 
-In order to connect to a network, you need to set up a scheme for it. ::
+In order to connect to a network, you need to set up a configureation for it in the wpa_supplicant.conf file. ::
 
     >>> cell = Cell.all('wlan0')[0]
-    >>> scheme = Scheme.for_cell('wlan0', 'home', cell, passkey)
-    >>> scheme.save()
-    >>> scheme.activate()
+    >>> network = Network.for_cell(cell, passkey, interface='wlan0')
+    >>> network.save()
+    >>> network.activate()
 
-Once you have a scheme saved, you can retrieve it using :meth:`Scheme.find`. ::
+Once you have a network saved, you can retrieve it using :meth:`Network.find`. ::
 
-    >>> scheme = Scheme.find('wlan0', 'home')
-    >>> scheme.activate()
+    >>> network = Network.find('home')
+    >>> network.activate()
 
 .. note::
 
-    Activating a scheme will disconnect from any other scheme before connecting.
+    Activating a network will disconnect from any other network before connecting.
 
     You must be root to connect to a network.
-    Wifi uses `ifdown` and `ifup` to connect and disconnect.
-
+    PiFi uses `wpa_cli reconfigure' and ifconfig up/down to connect/disconnect to the networks specified
+    in the wpa_supplicant.conf file
 
 .. autoclass:: Cell
     :members:
 
-.. autoclass:: Scheme
+.. autoclass:: Network
     :members:

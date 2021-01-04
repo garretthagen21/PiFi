@@ -10,9 +10,6 @@
 #
 
 
-"""wpa_config - a small helper for wpa_supplicant."""
-
-from __future__ import print_function
 
 import subprocess
 from ifconfigparser import IfconfigParser
@@ -47,6 +44,10 @@ class Network(object):
             string += '\t{}={}\n'.format(opt, val)
         string += '}'
         return string
+
+    @property
+    def nickname(self):
+        return self.opts.get("id_str")
 
     def set_interface(self, interface):
         self.interface = interface
@@ -104,8 +105,10 @@ class Network(object):
                 if "network" and "{" in line and not entry_found:
                     entry_start_index = curr_index
 
-                # The current line contains the ssid we are looking for and we are in a block
-                elif "ssid" and self.ssid in line and entry_start_index:
+                # The current line contains the ssid or nick name we are looking for and we are in a block
+                elif ("ssid" and self.ssid in line) or \
+                        (self.nickname and ("id_str" and self.nickname in line)) \
+                        and entry_start_index:
                     entry_found = True
 
                 # We have reached end bracket, have found our entry, and have not yet set the end block
@@ -119,17 +122,12 @@ class Network(object):
             # End index is calculated inclusively, but sliced exclusively so add 1
             entry_end_index = min(entry_end_index + 1, len(all_lines))
 
-            # print("Removing Lines from Index: " + str(entry_start_index) + " to " + str(entry_end_index) + "\n\n")
-            # print(''.join(all_lines[entry_start_index:entry_end_index]))
-
             # Remove the entry from all lines
             all_lines = all_lines[:entry_start_index] + all_lines[entry_end_index:]
 
             # Piece the list back together
             wpa_supplicant_temp_file = supplicant_file + ".tmp"
             file_output = ''.join(all_lines)
-            # print("Writing Contents To Tempfile: " + wpa_supplicant_temp_file + "\n\n")
-            # print(file_output)
             temp_file = open(wpa_supplicant_temp_file, 'w')
             temp_file.write(file_output)
             temp_file.close()
@@ -174,7 +172,8 @@ class Network(object):
     def _reload_wpa_client(self):
         # Restart connection management
         subprocess.check_output(['ifconfig', self.interface, 'up'])
-        wpa_cli_output = subprocess.check_output(['wpa_cli', '-i', self.interface, 'reconfigure'], stderr=subprocess.STDOUT)
+        wpa_cli_output = subprocess.check_output(['wpa_cli', '-i', self.interface, 'reconfigure'],
+                                                 stderr=subprocess.STDOUT).decode('utf-8')
         return wpa_cli_output
 
     @classmethod
@@ -200,10 +199,16 @@ class Network(object):
         return cls(ssid, **opts)
 
     @classmethod
-    def find(cls, ssid, supplicant_file=WPA_SUPPLICANT_CONFIG):
+    def find(cls, ssid, name=None,supplicant_file=WPA_SUPPLICANT_CONFIG):
         all_networks = cls.all(supplicant_file)
+        # First try ssid
         for network in all_networks:
             if network.ssid == ssid:
+                return network
+
+        # If unsuccessful try name
+        for network in all_networks:
+            if network.nickname and name and network.nickname == name:
                 return network
         return None
 

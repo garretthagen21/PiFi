@@ -1,8 +1,4 @@
 
-**Note** PiFi is based off of the archived Wifi library originally created by Rocky Meza: https://travis-ci.org/rockymeza/wifi
-
-----
-
 PiFi
 ----
 
@@ -16,7 +12,9 @@ a Raspberry Pi Device. The pifi command is also implemented as a library that ca
     # pifi --help
 
 
-.. image:: https://travis-ci.org/rockymeza/wifi.png?branch=master
-   :target: https://travis-ci.org/rockymeza/wifi
+.. image:: https://travis-ci.org/garretthagen21/pifi.png?branch=master
+   :target: https://travis-ci.org/garretthagen21/wifi
 
 The documentation for wifi lives at https://wifi.readthedocs.org/en/latest/.
+
+**Note** PiFi is based off of the archived wifi library originally created by Rocky Meza: https://github.com/rockymeza/wifi.git

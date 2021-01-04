@@ -53,7 +53,7 @@ if should_install_cli:
 setup(
     name='pifi',
     version=version,
-    author='Rocky Meza, Gavin Wahl, Garrett Hagen',
+    author='Garrett Hagen, Rocky Meza, Gavin Wahl',
     author_email='garretthagen21@gmail.com',
     description=__doc__,
     long_description='\n\n'.join([read('README.rst'), read('CHANGES.rst')]),
