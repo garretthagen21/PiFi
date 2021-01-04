@@ -37,7 +37,7 @@ This will install the :doc:`the wifi command <wifi_command>`, a Python library f
 On some systems, the wifi command name is already used, and installing wifi will cause issues with the system.
 In those cases you can override the command name that is installed::
 
-    $ WIFI_CLI_NAME=cool-wifi pip install wifi
+    $ PIFI_CLI_NAME=cool-wifi pip install wifi
 
 `The wifi executable <wifi_command>` will instead be named `cool-wifi`.
 

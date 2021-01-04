@@ -8,7 +8,7 @@ try:
 except ImportError:  # Python < 3
     from StringIO import StringIO
 
-from wifi.utils import print_table, match, db2dbm
+from pifi.utils import print_table, match, db2dbm
 
 
 print_table_in = [

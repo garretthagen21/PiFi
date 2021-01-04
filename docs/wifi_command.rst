@@ -1,19 +1,19 @@
-The wifi Command
+The pifi Command
 ================
 
-This library comes with a command line program for managing and saving your WiFi connections.
+This library comes with a command line program for managing and saving your Pifi connections.
 
 Tutorial
 ^^^^^^^^
 
 This tutorial assumes you are comfortable on the command line.
-(If you aren't, perhaps wifi is not quite the right tool for you.)
+(If you aren't, perhaps pifi is not quite the right tool for you.)
 
-First, if you haven't already, install wifi.
+First, if you haven't already, install pifi.
 
 .. code-block:: sh
 
-    $ pip install wifi
+    $ pip install pifi
 
 Now, you want to see what networks are available.
 You can run the ``scan`` command to do that.
@@ -23,7 +23,7 @@ You can run the ``scan`` command to do that.
 
 .. code-block:: sh
 
-    # wifi scan
+    # pifi scan
     -61  SomeNet                  protected
     -62  SomeOtherNet             unprotected
     -78  zxy-12345                protected
@@ -35,16 +35,16 @@ You can run the ``scan`` command to do that.
 
 .. note::
 
-    The wifi command is also accessible through the python argument as::
+    The pifi command is also accessible through the python argument as::
 
-        # python -m wifi
+        # python -m pifi
 
 The scan command returns three bits of data: the signal quality, the SSID and if the network is protected or not.
 If you want to order the networks by quality, you can pipe the output into sort.
 
 .. code-block:: sh
 
-    # wifi scan | sort -rn
+    # pifi scan | sort -rn
     -61  SomeNet                  protected
     -62  SomeOtherNet             unprotected
     -78  zxy-12345                protected
@@ -61,17 +61,17 @@ We can connect to it directly using the ``connect`` command.
 
 .. code-block:: sh
 
-    # wifi connect --ad-hoc SomeNet
+    # pifi connect --ad-hoc SomeNet
     passkey>
 
 The ``--ad-hoc`` or ``-a`` option allows us to connect to a network that we haven't configured before.
-The wifi asks you for a passkey if the network is protected and then it will connect.
+The pifi asks you for a passkey if the network is protected and then it will connect.
 
 If you want to actually save the configuration instead of just connecting once, you can use the ``add`` command.
 
 .. code-block:: sh
 
-    # wifi add some SomeNet
+    # pifi add some SomeNet
     passkey>
 
 ``some`` here is a nickname for the network you can use when you want to connect to the network again.
@@ -79,7 +79,7 @@ Now we can connect to the saved network if you want using the ``connect`` comman
 
 .. code-block:: sh
 
-    # wifi connect some
+    # pifi connect some
     ...
 
 If you wish to see all the saved networks, you can use the ``list`` command.
@@ -87,7 +87,7 @@ If you wish to see all the saved networks, you can use the ``list`` command.
 
 .. code-block:: sh
 
-    # wifi list
+    # pifi list
     some
 
 Usage
@@ -95,45 +95,45 @@ Usage
 
 ::
 
-    usage: wifi {scan,list,config,add,connect,init} ...
+    usage: pifi {scan,list,config,add,connect,init} ...
 
 scan
 ----
 
 Shows a list of available networks. ::
 
-    usage: wifi scan
+    usage: pifi scan
 
 list
 ----
 
 Shows a list of networks already configured. ::
 
-    usage: wifi list
+    usage: pifi list
 
 add, config
 -----------
 
 Prints or adds the configuration to connect to a new network. ::
 
-    usage: wifi config SCHEME [SSID]
-    usage: wifi add SCHEME [SSID]
+    usage: pifi config NETWORK [SSID]
+    usage: pifi add NETWORK [SSID]
 
     positional arguments:
-      SCHEME      A memorable nickname for a wireless network. If SSID is not
-                  provided, the network will be guessed using SCHEME.
+      NETWORK     A memorable nickname for a wireless network. If SSID is not
+                  provided, the network will be guessed using NETWORK.
       SSID        The SSID for the network to which you wish to connect. This is
                   fuzzy matched, so you don't have to be precise.
 
 connect
 -------
 
-Connects to the network corresponding to SCHEME. ::
+Connects to the network corresponding to NETWORK. ::
 
-    usage: wifi connect [-a] SCHEME
+    usage: pifi connect [-a] NETWORK
 
     positional arguments:
-      SCHEME        The nickname of the network to which you wish to connect.
+      NETWORK        The nickname of the network to which you wish to connect.
 
     optional arguments:
       -a, --ad-hoc  Connect to a network without storing it in the config file
@@ -141,15 +141,15 @@ Connects to the network corresponding to SCHEME. ::
 autoconnect
 -----------
 
-Searches for saved schemes that are currently available and connects to the
+Searches for saved networks that are currently available and connects to the
 first one it finds. ::
 
-    usage: wifi autoconnect
+    usage: pifi autoconnect
 
 
 Completion
 ^^^^^^^^^^
 
-The wifi command also comes packaged with completion for bash.
-If you want to write completion for your own shell, wifi provides an interface for extracting completion information.
-Please see the ``wifi-completion.bash`` and ``bin/wifi`` files for more information.
+The pifi command also comes packaged with completion for bash.
+If you want to write completion for your own shell, pifi provides an interface for extracting completion information.
+Please see the ``pifi-completion.bash`` and ``bin/pifi`` files for more information.

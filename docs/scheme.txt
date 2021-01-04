@@ -1,0 +1,247 @@
+"""import re
+import itertools
+import wpa_config.
+
+import wifi.subprocess_compat as subprocess
+from wifi.utils import ensure_file_exists
+from wifi.exceptions import ConnectionError
+
+class ConfigOptions(object):
+    def __init__(self,ssid,passkey=None,key_mgmt="WPA-PSK",proto=None,id_str=None,priority=None):
+        self.ssid = ssid
+        self.passkey = passkey
+        self.key_mgmt = key_mgmt
+        self.priority = priority
+        self.id_str = id_str
+        self.proto = proto
+        if passkey is None:
+            self.key_mgmt = "NONE"
+
+    def __str__(self):
+        entry_str="network{"+"\n"
+        entry_str+="\tkey_mgmt="+self.key_mgmt+"\n"
+        entry_str+="\tssid='"+self.ssid+"'"+"\n"
+        if self.passkey: entry_str+="\tpsk='"+self.passkey+"'"+"\n"
+        if self.proto: entry_str+="\tproto="+self.proto+"\n"
+        if self.priority: entry_str+="\tpriority="+self.priority+"\n"
+        if self.id_str: entry_str+="\tid_str="+self.id_str+"\n"
+        entry_str+="}"
+
+        return entry_str
+
+def configuration(cell, passkey=None):
+    """
+    Returns a WPA Config object of configuration options for cell
+
+    Asks for a password if necessary
+    """
+    if not cell.encrypted:
+        return ConfigOptions(ssid=cell.ssid,passkey=passkey,key_mgmt="NONE",proto=cell.encryption_type)
+    else:
+        return ConfigOptions(ssid=cell.ssid,passkey=passkey,key_mgmt="WPA-PSK",proto=cell.encryption_type)
+
+
+
+bound_ip_re = re.compile(r'^bound to (?P<ip_address>\S+)', flags=re.MULTILINE)
+
+
+
+class WPAScheme(object):
+    """
+    Saved configuration for connecting to a wireless network.  This
+    class provides a Python interface to the /etc/network/interfaces
+    file.
+    """
+
+    wpa_supplicant_conf = "/etc/wpa_supplicant/wpa_supplicant.conf"
+    wpa_supplicant_conf_temp = "/etc/wpa_supplicant/wpa_supplicant_temp.conf"
+
+    @classmethod
+    def for_file(cls, wpa_supplicant_conf):
+        """
+        A class factory for providing a nice way to specify the interfaces file
+        that you want to use.  Use this instead of directly overwriting the
+        interfaces Class attribute if you care about thread safety.
+        """
+        return type(cls)(cls.__name__, (cls,), {
+            'wpa_supplicant_conf': wpa_supplicant_conf,
+        })
+
+    def __init__(self, interface, name, config:ConfigOptions):
+        self.interface = interface
+        self.name = name
+        self.config = config
+
+    def __str__(self):
+        """
+        Returns the representation of a scheme that you would need
+        in the /etc/network/interfaces file.
+        """
+
+        return '\n' + str(self.config) + '\n'
+
+    def __repr__(self):
+        return 'Scheme(interface={interface!r}, name={name!r}, options={options!r}'.format(**vars(self))
+
+    @classmethod
+    def all(cls):
+        """
+        Returns an generator of saved schemes.
+        """
+        ensure_file_exists(cls.wpa_supplicant_conf)
+        with open(cls.wpa_supplicant_conf, 'r') as f:
+            return extract_schemes(f.read(), scheme_class=cls)
+
+    @classmethod
+    def where(cls, fn):
+        return list(filter(fn, cls.all()))
+
+    @classmethod
+    def find(cls, name):
+        """
+        Returns a :class:`Scheme` or `None` based on interface and
+        name.
+        """
+        try:
+            return cls.where(lambda s: s.name == name)[0]
+        except IndexError:
+            return None
+
+    @classmethod
+    def for_cell(cls, interface, name, cell, passkey=None):
+        """
+        Intuits the configuration needed for a specific
+        :class:`Cell` and creates a :class:`Scheme` for it.
+        """
+        return cls(interface, name, configuration(cell, passkey))
+
+    def save(self):
+        """
+        Writes the configuration to the :attr:`interfaces` file.
+        """
+        assert not self.find(self.name), "This scheme already exists"
+
+        with open(self.wpa_supplicant_conf, 'a') as f:
+            f.write('\n')
+            f.write(str(self))
+
+    def delete(self):
+        """
+        Deletes the configuration from the :attr:`interfaces` file.
+        """
+
+        # Read in the contents of supplicant conf
+        file_in = open(self.wpa_supplicant_conf, 'r')
+        all_lines = file_in.readlines()
+        file_in.close()
+
+
+        curr_index = 0
+        entry_start_index = None
+        entry_end_index = None
+        entry_found = False
+
+        for line in all_lines:
+            line = line.strip()
+            # If line is not whitespace or comment
+            if line and not line.startswith("#"):
+
+                # We are at the beginning of an entry block and have not found our entry yet
+                if "network" and "{" in line and not entry_found:
+                    entry_start_index = curr_index
+
+                # The current line contains the ssid we are looking for
+                elif "ssid" and self.name in line and entry_start_index:
+                    entry_found = True
+
+                # We have reached end brackets, have found our entry, and have not yet set the end block
+                elif "}" in line and entry_found and not entry_end_index:
+                    entry_end_index = curr_index
+
+            curr_index+=1
+
+        # If we have valid indices and an entry has been found, remove everything between the two indicies
+        if entry_found and entry_start_index and entry_end_index:
+            all_lines=all_lines[:entry_start_index] + all_lines[entry_end_index:]
+
+
+        file_output=''.join(all_lines)
+        temp_file = open(self.wpa_supplicant_conf_temp, 'w')
+        temp_file.write(file_output)
+        temp_file.close()
+
+        # Overwrite the temp file
+        subprocess.check_output(['mv',self.wpa_supplicant_conf_temp,self.wpa_supplicant_conf])
+
+
+
+    def activate(self):
+        """
+        Connects to the network as configured in this scheme.
+        """
+        # Save if does not exist
+        if not self.find(self.config.ssid):
+            self.save()
+
+        subprocess.check_output(['ifconfig', self.interface,'up'])
+        wpa_cli_output = subprocess.check_output(['wpa_cli', '-i', self.interface, 'reconfigure'], stderr=subprocess.STDOUT).decode('utf-8')
+
+        if 'OK' in wpa_cli_output:
+            ifconfig_output = subprocess.check_output(['ifconfig', self.interface])
+            return self.parse_ifconfig_output(ifconfig_output)
+        else:
+            raise ConnectionError("An error occured during wpa_cli reconfigure %r" % self)
+
+    def parse_ifconfig_output(self, output):
+
+        for l in output.split('\n'):
+            if l.strip().startswith("inet addr:"):
+                ip_address = l.strip().split(' ')[1].split(':')[1]
+                return Connection(scheme=self, ip_address=ip_address)
+
+        raise ConnectionError("Failed to connect to %r" % self)
+
+
+class Connection(object):
+    """
+    The connection object returned when connecting to a Scheme.
+    """
+    def __init__(self, scheme, ip_address):
+        self.scheme = scheme
+        self.ip_address = ip_address
+
+
+scheme_re = re.compile(r'iface\s+(?P<interface>[^-]+)(?:-(?P<name>\S+))?')
+
+
+def extract_schemes(interfaces, scheme_class=WPAScheme):
+    # Read in the contents of supplicant conf
+    file_in = open(scheme_class.wpa_supplicant_conf, 'r')
+    all_lines = file_in.readlines()
+    file_in.close()
+
+
+    curr_index = 0
+    entry_start_index = None
+    entry_end_index = None
+    entry_found = False
+
+    for line in all_lines:
+        line = line.strip()
+        # If line is not whitespace or comment
+        if line and not line.startswith("#"):
+
+            # We are at the beginning of an entry block and have not found our entry yet
+            if "network" and "{" in line and not entry_found:
+                entry_start_index = curr_index
+
+            # The current line contains the ssid we are looking for
+            elif "ssid" and self.name in line and entry_start_index:
+                entry_found = True
+
+            # We have reached end brackets, have found our entry, and have not yet set the end block
+            elif "}" in line and entry_found and not entry_end_index:
+                entry_end_index = curr_index
+
+        curr_index+=1
+"""

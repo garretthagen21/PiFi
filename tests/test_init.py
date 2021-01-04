@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from wifi.scan import Cell
+from pifi.scan import Cell
 
 class CorrectInitTest(TestCase):
     fields = {"ssid": None,
@@ -18,5 +18,5 @@ class CorrectInitTest(TestCase):
     def test_empty_init(self):
         tcell = Cell()
 
-        for field, value in self.fields.iteritems():
+        for field, value in self.fields.items():
             self.assertEqual(value, getattr(tcell, field))
