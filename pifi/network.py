@@ -162,8 +162,9 @@ class Network(object):
 
     def get_connection_data(self):
         ifconfig_output = subprocess.check_output(['ifconfig'])
-        ifconfig_parse = IfconfigParser(console_output=ifconfig_output)
+
         try:
+            ifconfig_parse = IfconfigParser(console_output=ifconfig_output)
             return ifconfig_parse.get_interface(self.interface)
         except Exception as e:
             print("An error occured looking for interface: " + self.interface)
@@ -173,8 +174,7 @@ class Network(object):
     def _reload_wpa_client(self):
         # Restart connection management
         subprocess.check_output(['ifconfig', self.interface, 'up'])
-        wpa_cli_output = subprocess.check_output(['wpa_cli', '-i', self.interface, 'reconfigure'],
-                                                 stderr=subprocess.STDOUT).decode('utf-8')
+        wpa_cli_output = subprocess.check_output(['wpa_cli', '-i', self.interface, 'reconfigure'], stderr=subprocess.STDOUT)
         return wpa_cli_output
 
     @classmethod
