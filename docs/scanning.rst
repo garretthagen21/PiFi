@@ -1,34 +1,32 @@
-Managing WiFi networks
-======================
-
-.. currentmodule:: pifi
+Managing WiFi Networks with PiFi
+================================
 
 Discovering networks
 --------------------
 
 You can use this library to scan for networks that are available in the air.
-To get a list of the different cells in the area, you can do ::
+To get a list of the different cells in the area, you can do ::Cell
 
     >>> from pifi import Cell, Network
     >>> Cell.all('wlan0')
 
-This returns a list of :class:`Cell` objects.  Under the hood, this calls `iwlist scan` and parses the unfriendly output.
+This returns a list of Class:`Cell` objects.  Under the hood, this calls `iwlist scan` and parses the unfriendly output.
 
 Each cell object should have the following attributes:
 
-- :attr:`ssid`
-- :attr:`signal`
-- :attr:`quality`
-- :attr:`frequency`
-- :attr:`bitrates`
-- :attr:`encrypted`
-- :attr:`channel`
-- :attr:`address`
-- :attr:`mode`
+- `ssid`
+- `signal`
+- `quality`
+- `frequency`
+- `bitrates`
+- `encrypted`
+- `channel`
+- `address`
+- `mode`
 
-For cells that have :attr:`encrypted` as `True`, there will also be the following attributes:
+For cells that have `encrypted` as `True`, there will also be the following attributes:
 
-- :attr:`encryption_type`
+- `encryption_type`
 
 .. note::
 
@@ -46,21 +44,13 @@ In order to connect to a network, you need to set up a configureation for it in 
     >>> network.save()
     >>> network.activate()
 
-Once you have a network saved, you can retrieve it using :meth:`Network.find`. ::
+Once you have a network saved, you can retrieve it using .. py:staticmethod:: Network.find
 
     >>> network = Network.find('home')
     >>> network.activate()
 
-.. note::
-
-    Activating a network will disconnect from any other network before connecting.
-
+.. note:: Activating a network will disconnect from any other network before connecting.
     You must be root to connect to a network.
-    PiFi uses `wpa_cli reconfigure' and ifconfig up/down to connect/disconnect to the networks specified
+    PiFi uses `wpa_cli reconfigure` and ifconfig up/down to connect/disconnect to the networks specified
     in the wpa_supplicant.conf file
 
-.. autoclass:: Cell
-    :members:
-
-.. autoclass:: Network
-    :members:
