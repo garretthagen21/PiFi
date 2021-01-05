@@ -64,10 +64,11 @@ class Network(object):
         """
 
         # Set to default config if unspecified
-        if not supplicant_file: supplicant_file = self.WPA_SUPPLICANT_CONFIG
+        if not supplicant_file:
+            supplicant_file = self.WPA_SUPPLICANT_CONFIG
 
         # Handle any existing networks
-        existing_network = Network.find(self.ssid)
+        existing_network = self.find(self.ssid)
         if existing_network:
             if not overwrite:
                 print("Network: " + str(
@@ -79,11 +80,10 @@ class Network(object):
         # Save the file
         with open(supplicant_file, 'a') as wpa_config:
             wpa_config.write('\n')
-            # wpa_config.write('\n# This Network Entry was Automatically Created by wpa-pifi Python Module #\n')
             wpa_config.write(str(self))
             wpa_config.write('\n')
 
-    def delete(self, supplicant_file=None):
+    def delete(self, supplicant_file=None,disconnect_immediately=True):
         """
         Deletes the configuration from the :attr:`interfaces` file.
         """
@@ -143,7 +143,8 @@ class Network(object):
             subprocess.check_output(['mv', wpa_supplicant_temp_file, supplicant_file])
 
             # Reload wpa client in case we deleted the network we were connected to
-            self._reload_wpa_client()
+            if disconnect_immediately:
+                self._reload_wpa_client()
 
             return True
         else:
@@ -209,9 +210,10 @@ class Network(object):
     def find(cls, ssid, name=None, supplicant_file=None):
 
         # Set to default config if unspecified
-        if not supplicant_file: supplicant_file = cls.WPA_SUPPLICANT_CONFIG
+        if not supplicant_file:
+            supplicant_file = cls.WPA_SUPPLICANT_CONFIG
 
-        all_networks = cls.all(supplicant_file)
+        all_networks = cls.all(supplicant_file=supplicant_file)
         # First try ssid
         for network in all_networks:
             if network.ssid == ssid:
@@ -229,7 +231,9 @@ class Network(object):
         Returns a list of Network objects.
         """
         # Set to default config if unspecified
-        if not supplicant_file: supplicant_file = cls.WPA_SUPPLICANT_CONFIG
+        if not supplicant_file:
+            supplicant_file = cls.WPA_SUPPLICANT_CONFIG
+
 
         with open(supplicant_file) as netfile:
             config = netfile.read()
@@ -248,13 +252,14 @@ class Network(object):
             if line == "}" and in_block:
                 in_block = False
                 nb = "\n".join(netblock)
-                networks.append(Network.from_string(nb))
+                networks.append(cls.from_string(nb))
                 netblock = []
         return networks
 
     @classmethod
     def new_network(cls, ssid, passkey="", is_open=False, id_str=None, priority=None, interface=DEFAULT_INTERFACE):
         network = cls(ssid)
+
         key_mgmt_type = "NONE"
         if not is_open:
             # check passphrase length
@@ -267,8 +272,10 @@ class Network(object):
         # Add option params
         network.set_interface(interface)
         network.add_option("key_mgmt", key_mgmt_type)
-        if id_str: network.add_option("id_str", '"{}"'.format(id_str))
-        if priority: network.add_option("priority", priority)
+        if id_str:
+            network.add_option("id_str", '"{}"'.format(id_str))
+        if priority:
+            network.add_option("priority", priority)
 
         return network
 

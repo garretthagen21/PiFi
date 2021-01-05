@@ -70,43 +70,40 @@ WPA_SUPP_CONFIG_CONTENTS = """
 class TestNetworks(TestCase):
     def setUp(self):
         self.tempfile, self.file_path = tempfile.mkstemp()
-        print("Temp File Path: "+self.file_path)
+        self.NetworkClass = Network.for_file(self.file_path)
 
-        with open(self.file_path, 'w') as f:
+        with open(self.NetworkClass.WPA_SUPPLICANT_CONFIG, 'w') as f:
             f.write(WPA_SUPP_CONFIG_CONTENTS)
 
-        self.Network = Network.for_file(self.file_path)
 
     def tearDown(self):
-        os.remove(self.Network.WPA_SUPPLICANT_CONFIG)
+        os.remove(self.NetworkClass.WPA_SUPPLICANT_CONFIG)
 
     def test_network_extraction(self):
-        all_networks = self.Network.all()
+        all_networks = self.NetworkClass.all()
         assert len(all_networks) == 6
         for network in all_networks:
-            assert network is not None
+            self.assertIsNotNone(network)
 
 
 
     def test_with_hyphen(self):
-        network_with_hyphen = self.Network.find("Test SSID5")
+        network_with_hyphen = self.NetworkClass.find("Test-SSID5")
         self.assertIsNotNone(network_with_hyphen)
-        self.assertEquals(network_with_hyphen.ssid,"Test-SSID5")
+        self.assertEqual(network_with_hyphen.ssid,"Test-SSID5")
 
     def test_with_space(self):
-        network_with_space = self.Network.find("Test SSID6")
+        network_with_space = self.NetworkClass.find("Test SSID6")
         self.assertIsNotNone(network_with_space)
-        self.assertEquals(network_with_space.ssid,"Test SSID6",)
-
-
+        self.assertEqual(network_with_space.ssid,"Test SSID6",)
 
     def test_delete(self):
-        delete_net = self.Network.find("TestSSID1")
-        delete_net.delete()
-        self.assertIsNone(self.Network.find("TestSSID1"))
+        delete_net = self.NetworkClass.find("TestSSID1")
+        delete_net.delete(disconnect_immediately=False)
+        self.assertIsNone(self.NetworkClass.find("TestSSID1"))
 
     def test_save(self):
-        new_network = self.Network.new_network(ssid='test_save')
+        new_network = self.NetworkClass.new_network(ssid='test_save',passkey="passkeypasskey",id_str='test_save_name')
         new_network.save()
         self.assertIsNotNone(new_network)
 
