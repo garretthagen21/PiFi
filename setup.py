@@ -65,7 +65,7 @@ setup(
     classifiers=[
         "License :: OSI Approved :: BSD License",
         "Topic :: System :: Networking",
-        "Operating System :: POSIX :: Linux :: Raspbian",
+        "Operating System :: POSIX :: Linux",
         "Environment :: Console",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.4",
