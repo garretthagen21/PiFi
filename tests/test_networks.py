@@ -70,6 +70,7 @@ WPA_SUPP_CONFIG_CONTENTS = """
 class TestNetworks(TestCase):
     def setUp(self):
         self.tempfile, self.file_path = tempfile.mkstemp()
+        print("Temp File Path: "+self.file_path)
 
         with open(self.file_path, 'w') as f:
             f.write(WPA_SUPP_CONFIG_CONTENTS)
@@ -88,14 +89,14 @@ class TestNetworks(TestCase):
 
 
     def test_with_hyphen(self):
-        network_with_hyphen = self.Network.find("Test SSID6")
-        assert network_with_hyphen is not None
-        assert network_with_hyphen.ssid == "Test-SSID5"
+        network_with_hyphen = self.Network.find("Test SSID5")
+        self.assertIsNotNone(network_with_hyphen)
+        self.assertEquals(network_with_hyphen.ssid,"Test-SSID5")
 
     def test_with_space(self):
-        network_with_hyphen = self.Network.find("Test-SSID5")
-        assert network_with_hyphen is not None
-        assert network_with_hyphen.ssid == "Test SSID6"
+        network_with_space = self.Network.find("Test SSID6")
+        self.assertIsNotNone(network_with_space)
+        self.assertEquals(network_with_space.ssid,"Test SSID6",)
 
 
 
@@ -105,9 +106,9 @@ class TestNetworks(TestCase):
         self.assertIsNone(self.Network.find("TestSSID1"))
 
     def test_save(self):
-        network = self.Network('test_save')
-        network.save()
-        assert self.Network.find('test_save')
+        new_network = self.Network.new_network(ssid='test_save')
+        new_network.save()
+        self.assertIsNotNone(new_network)
 
 """
 class TestActivation(TestCase):

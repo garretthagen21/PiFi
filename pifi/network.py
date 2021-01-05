@@ -206,7 +206,7 @@ class Network(object):
         return cls(ssid, **opts)
 
     @classmethod
-    def find(cls, ssid, name=None,supplicant_file=None):
+    def find(cls, ssid, name=None, supplicant_file=None):
 
         # Set to default config if unspecified
         if not supplicant_file: supplicant_file = cls.WPA_SUPPLICANT_CONFIG
