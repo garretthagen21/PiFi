@@ -8,7 +8,7 @@ Command line tool and library wrappers around iwlist and
 /etc/wpa_supplicant/wpa_supplicant.conf.
 """
 
-version = '1.0.0'
+version = '0.5.0'
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
@@ -69,7 +69,12 @@ setup(
         "Operating System :: POSIX :: Linux :: Raspbian",
         "Environment :: Console",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8"
+
     ],
     data_files=data_files
 )

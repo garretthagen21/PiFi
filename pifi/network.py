@@ -2,13 +2,12 @@
 #
 # @file    network.py
 # 
-# @brief       
+# @brief   This class handles network configurations that are loaded to and from wpa_supplicant.conf
 #
 # @author  Garrett Hagen <garretthagen21@gmail.com>
 # 
 # @date    2021-01-03 
 #
-
 
 
 import subprocess
@@ -83,7 +82,7 @@ class Network(object):
             wpa_config.write(str(self))
             wpa_config.write('\n')
 
-    def delete(self, supplicant_file=None,disconnect_immediately=True):
+    def delete(self, supplicant_file=None, disconnect_immediately=True):
         """
         Deletes the configuration from the :attr:`interfaces` file.
         """
@@ -233,7 +232,6 @@ class Network(object):
         # Set to default config if unspecified
         if not supplicant_file:
             supplicant_file = cls.WPA_SUPPLICANT_CONFIG
-
 
         with open(supplicant_file) as netfile:
             config = netfile.read()

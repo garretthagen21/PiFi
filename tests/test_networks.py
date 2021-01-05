@@ -65,6 +65,7 @@ WPA_SUPP_CONFIG_CONTENTS = """
     }
 """
 
+
 # TODO: This needs more extensive test cases
 
 class TestNetworks(TestCase):
@@ -75,7 +76,6 @@ class TestNetworks(TestCase):
         with open(self.NetworkClass.WPA_SUPPLICANT_CONFIG, 'w') as f:
             f.write(WPA_SUPP_CONFIG_CONTENTS)
 
-
     def tearDown(self):
         os.remove(self.NetworkClass.WPA_SUPPLICANT_CONFIG)
 
@@ -85,17 +85,15 @@ class TestNetworks(TestCase):
         for network in all_networks:
             self.assertIsNotNone(network)
 
-
-
     def test_with_hyphen(self):
         network_with_hyphen = self.NetworkClass.find("Test-SSID5")
         self.assertIsNotNone(network_with_hyphen)
-        self.assertEqual(network_with_hyphen.ssid,"Test-SSID5")
+        self.assertEqual(network_with_hyphen.ssid, "Test-SSID5")
 
     def test_with_space(self):
         network_with_space = self.NetworkClass.find("Test SSID6")
         self.assertIsNotNone(network_with_space)
-        self.assertEqual(network_with_space.ssid,"Test SSID6",)
+        self.assertEqual(network_with_space.ssid, "Test SSID6", )
 
     def test_delete(self):
         delete_net = self.NetworkClass.find("TestSSID1")
@@ -103,9 +101,10 @@ class TestNetworks(TestCase):
         self.assertIsNone(self.NetworkClass.find("TestSSID1"))
 
     def test_save(self):
-        new_network = self.NetworkClass.new_network(ssid='test_save',passkey="passkeypasskey",id_str='test_save_name')
+        new_network = self.NetworkClass.new_network(ssid='test_save', passkey="passkeypasskey", id_str='test_save_name')
         new_network.save()
         self.assertIsNotNone(new_network)
+
 
 """
 class TestActivation(TestCase):
@@ -193,7 +192,6 @@ class TestForCell(TestCase):
             'wireless-channel': 'auto',
         })
 """
-
 
 SUCCESSFUL_IFDOWN_OUTPUT = """Internet Systems Consortium DHCP Client 4.2.4
 Copyright 2004-2012 Internet Systems Consortium.
