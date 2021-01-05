@@ -1,19 +1,19 @@
-The pifi Command
+The wpa_pyfi Command
 ================
 
-This library comes with a command line program for managing and saving your Pifi connections.
+This library comes with a command line program for managing and saving your Wpa_pyfi connections.
 
 Tutorial
 ^^^^^^^^
 
 This tutorial assumes you are comfortable on the command line.
-(If you aren't, perhaps pifi is not quite the right tool for you.)
+(If you aren't, perhaps wpa_pyfi is not quite the right tool for you.)
 
-First, if you haven't already, install pifi.
+First, if you haven't already, install wpa_pyfi.
 
 .. code-block:: sh
 
-    $ pip install pifi
+    $ pip install wpa_pyfi
 
 Now, you want to see what networks are available.
 You can run the ``scan`` command to do that.
@@ -23,7 +23,7 @@ You can run the ``scan`` command to do that.
 
 .. code-block:: sh
 
-    # pifi scan
+    # wpa_pyfi scan
     -61  SomeNet                  protected
     -62  SomeOtherNet             unprotected
     -78  zxy-12345                protected
@@ -35,16 +35,16 @@ You can run the ``scan`` command to do that.
 
 .. note::
 
-    The pifi command is also accessible through the python argument as::
+    The wpa_pyfi command is also accessible through the python argument as::
 
-        # python -m pifi
+        # python -m wpa_pyfi
 
 The scan command returns three bits of data: the signal quality, the SSID and if the network is protected or not.
 If you want to order the networks by quality, you can pipe the output into sort.
 
 .. code-block:: sh
 
-    # pifi scan | sort -rn
+    # wpa_pyfi scan | sort -rn
     -61  SomeNet                  protected
     -62  SomeOtherNet             unprotected
     -78  zxy-12345                protected
@@ -61,17 +61,17 @@ We can connect to it directly using the ``connect`` command.
 
 .. code-block:: sh
 
-    # pifi connect --ad-hoc SomeNet
+    # wpa_pyfi connect --ad-hoc SomeNet
     passkey>
 
 The ``--ad-hoc`` or ``-a`` option allows us to connect to a network that we haven't configured before.
-The pifi asks you for a passkey if the network is protected and then it will connect.
+The wpa_pyfi asks you for a passkey if the network is protected and then it will connect.
 
 If you want to actually save the configuration instead of just connecting once, you can use the ``add`` command.
 
 .. code-block:: sh
 
-    # pifi add some SomeNet
+    # wpa_pyfi add some SomeNet
     passkey>
 
 ``some`` here is a nickname for the network you can use when you want to connect to the network again.
@@ -79,7 +79,7 @@ Now we can connect to the saved network if you want using the ``connect`` comman
 
 .. code-block:: sh
 
-    # pifi connect some
+    # wpa_pyfi connect some
     ...
 
 If you wish to see all the saved networks, you can use the ``list`` command.
@@ -87,7 +87,7 @@ If you wish to see all the saved networks, you can use the ``list`` command.
 
 .. code-block:: sh
 
-    # pifi list
+    # wpa_pyfi list
     some
 
 Usage
@@ -95,30 +95,30 @@ Usage
 
 ::
 
-    usage: pifi {scan,list,config,add,connect,init} ...
+    usage: wpa_pyfi {scan,list,config,add,connect,init} ...
 
 scan
 ----
 
 Shows a list of available networks. ::
 
-    usage: pifi scan
+    usage: wpa_pyfi scan
 
 list
 ----
 
 Shows a list of networks already configured. ::
 
-    usage: pifi list
+    usage: wpa_pyfi list
 
 add, config, connect
 --------------------
 
 Prints or adds the configuration to connect to a new network. ::
 
-    usage: pifi config SSID [NETNAME]
-    usage: pifi add SSID [NETNAME]
-    usage: pifi connect SSID [NETNAME]
+    usage: wpa_pyfi config SSID [NETNAME]
+    usage: wpa_pyfi add SSID [NETNAME]
+    usage: wpa_pyfi connect SSID [NETNAME]
 
     positional arguments:
 
@@ -137,12 +137,12 @@ autoconnect
 Searches for saved networks that are currently available and connects to the
 first one it finds. ::
 
-    usage: pifi autoconnect
+    usage: wpa_pyfi autoconnect
 
 
 Completion
 ^^^^^^^^^^
 
-The pifi command also comes packaged with completion for bash.
-If you want to write completion for your own shell, pifi provides an interface for extracting completion information.
-Please see the ``pifi-completion.bash`` and ``bin/pifi`` files for more information.
+The wpa_pyfi command also comes packaged with completion for bash.
+If you want to write completion for your own shell, wpa_pyfi provides an interface for extracting completion information.
+Please see the ``wpa_pyfi-completion.bash`` and ``bin/wpa_pyfi`` files for more information.
