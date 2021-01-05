@@ -3,10 +3,7 @@ from setuptools import setup
 import os
 import sys
 
-__doc__ = """
-Command line tool and library wrappers around iwlist and
-/etc/wpa_supplicant/wpa_supplicant.conf.
-"""
+__doc__ = """Command line tool and library wrapper around '/etc/wpa_supplicant/wpa_supplicant.conf'"""
 
 version = '0.5.0'
 
@@ -49,13 +46,15 @@ if should_install_cli:
         data_files.append(('/etc/bash_completion.d/', ['extras/pifi-completion.bash']))
     else:
         print("Not installing bash completion because of lack of permissions.")
-
+long_desc = ''.join([read('README.rst'), read('CHANGES.rst')])
 setup(
     name='pifi',
     version=version,
     author='Garrett Hagen, Rocky Meza, Gavin Wahl',
     author_email='garretthagen21@gmail.com',
     description=__doc__,
+    url='https://github.com/garretthagen21/PiFi.git',
+    long_description_content_type='text/x-rst',
     long_description='\n\n'.join([read('README.rst'), read('CHANGES.rst')]),
     packages=['pifi'],
     entry_points=entry_points,
@@ -73,8 +72,7 @@ setup(
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8"
-
+        "Programming Language :: Python :: 3.8",
     ],
     data_files=data_files
 )

@@ -1,8 +1,9 @@
 Changelog
 =========
+
 0.5.0
 ^^^^^
-:release-date: unknown
+:release-date: 2021-01-04
 
 - Packaged renamed from wifi to pifi
 - Project was rebuilt to run on wpa_cli instead of ifup and ifdown (a noteable issue for RPi Users)
