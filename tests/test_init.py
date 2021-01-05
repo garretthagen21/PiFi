@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from pifi.scan import Cell
+from wpa_pyfi.scan import Cell
 
 class CorrectInitTest(TestCase):
     fields = {"ssid": None,

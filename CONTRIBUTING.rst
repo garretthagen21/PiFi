@@ -11,14 +11,14 @@ How to Submit an Issue
 Issues include bug reports, feature requests, documentation requests, and lots
 of other things too.
 
-1.  Go to https://github.com/garretthagen21/PiFi/issues to see the issue tracker.
+1.  Go to https://github.com/garretthagen21/wpa_pyfi/issues to see the issue tracker.
 
 2.  Please make sure that the issue hasn't already been opened by somebody
     else.
 
 3.  Create a New Issue.  If it is a bug, please tell me what distro you are
     using.  I don't have the capacity to test against a bunch of distros, but I
-    do want PiFi to work on more than just the one that I use.
+    do want Wpa_pyfi to work on more than just the one that I use.
 
 How to Submit a Pull Request
 ============================

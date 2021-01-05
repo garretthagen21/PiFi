@@ -5,7 +5,7 @@ Changelog
 ^^^^^
 :release-date: 2021-01-04
 
-- Packaged renamed from wifi to pifi
+- Packaged renamed from wifi to wpa_pyfi
 - Project was rebuilt to run on wpa_cli instead of ifup and ifdown (a noteable issue for RPi Users)
 - Scheme class was replaced with Network class
 - Configurations are saved by default in /etc/wpa_supplicant/wpa_supplicant.conf instead of /etc/networks/interfaces (previous)

@@ -1,7 +1,7 @@
 The wpa_pyfi Command
-================
+====================
 
-This library comes with a command line program for managing and saving your Wpa_pyfi connections.
+This library comes with a command line program for managing and saving your wpa_pyfi connections.
 
 Tutorial
 ^^^^^^^^

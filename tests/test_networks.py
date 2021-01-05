@@ -2,9 +2,9 @@ from unittest import TestCase
 import tempfile
 import os
 
-from pifi import Cell
-from pifi.network import Network
-from pifi.exceptions import ConnectionError
+from wpa_pyfi import Cell
+from wpa_pyfi.network import Network
+from wpa_pyfi.exceptions import ConnectionError
 
 # TODO: Implement these tests
 WPA_SUPP_CONFIG_CONTENTS = """

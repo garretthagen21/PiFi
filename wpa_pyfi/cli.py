@@ -4,9 +4,9 @@ import argparse
 import sys
 import os
 
-from wpa-pyfi import Cell, Network
-from wpa-pyfi.utils import print_table, match as fuzzy_match
-from wpa-pyfi.exceptions import ConnectionError, InterfaceError
+from wpa_pyfi import Cell, Network
+from wpa_pyfi.utils import print_table, match as fuzzy_match
+from wpa_pyfi.exceptions import ConnectionError, InterfaceError
 
 
 def fuzzy_find_cell(interface, query):

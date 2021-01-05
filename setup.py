@@ -22,12 +22,12 @@ except:
 
 
 
-should_install_cli = os.environ.get('PIFI_INSTALL_CLI') not in ['False', '0']
-command_name = os.environ.get('PIFI_CLI_NAME', 'pifi')
+should_install_cli = os.environ.get('WPA_PYFI_INSTALL_CLI') not in ['False', '0']
+command_name = os.environ.get('WPA_PYFI_CLI_NAME', 'wpa_pyfi')
 
-if command_name == 'pifi.py':
+if command_name == 'wpa_pyfi.py':
     print(
-        "Having a command name of pifi.py will result in a weird ImportError"
+        "Having a command name of wpa_pyfi.py will result in a weird ImportError"
         " that doesn't seem possible to work around. Pretty much any other"
         " name seems to work though."
     )
@@ -38,25 +38,25 @@ data_files = []
 
 if should_install_cli:
     entry_points['console_scripts'] = [
-        '{command} = pifi.cli:main'.format(command=command_name),
+        '{command} = wpa_pyfi.cli:main'.format(command=command_name),
     ]
     # make sure we actually have write access to the target folder and if not don't
     # include it in data_files
     if os.access('/etc/bash_completion.d/', os.W_OK):
-        data_files.append(('/etc/bash_completion.d/', ['extras/pifi-completion.bash']))
+        data_files.append(('/etc/bash_completion.d/', ['extras/wpa_pyfi_completion.bash']))
     else:
         print("Not installing bash completion because of lack of permissions.")
-long_desc = ''.join([read('README.rst'), read('CHANGES.rst')])
+
 setup(
-    name='pifi',
+    name='wpa_pyfi',
     version=version,
     author='Garrett Hagen, Rocky Meza, Gavin Wahl',
     author_email='garretthagen21@gmail.com',
     description=__doc__,
-    url='https://github.com/garretthagen21/PiFi.git',
+    url='https://github.com/garretthagen21/wpa_pyfi.git',
     long_description_content_type='text/x-rst',
     long_description='\n\n'.join([read('README.rst'), read('CHANGES.rst')]),
-    packages=['pifi'],
+    packages=['wpa_pyfi'],
     entry_points=entry_points,
     test_suite='tests',
     platforms=["Debian"],

@@ -1,5 +1,5 @@
-Managing WiFi Networks with PiFi
-================================
+Managing WiFi Networks with wpa_pyfi
+====================================
 
 Discovering networks
 --------------------
@@ -7,7 +7,7 @@ Discovering networks
 You can use this library to scan for networks that are available in the air.
 To get a list of the different cells in the area, you can do ::Cell
 
-    >>> from pifi import Cell, Network
+    >>> from wpa_pyfi import Cell, Network
     >>> Cell.all('wlan0')
 
 This returns a list of Class:`Cell` objects.  Under the hood, this calls `iwlist scan` and parses the unfriendly output.
@@ -51,6 +51,6 @@ Once you have a network saved, you can retrieve it using .. py:staticmethod:: Ne
 
 .. note:: Activating a network will disconnect from any other network before connecting.
     You must be root to connect to a network.
-    PiFi uses `wpa_cli reconfigure` and ifconfig up/down to connect/disconnect to the networks specified
+    Wpa_pyfi uses `wpa_cli reconfigure` and ifconfig up/down to connect/disconnect to the networks specified
     in the wpa_supplicant.conf file
 

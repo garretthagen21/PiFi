@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from pifi.scan import Cell
-from pifi.exceptions import InterfaceError
+from wpa_pyfi.scan import Cell
+from wpa_pyfi.exceptions import InterfaceError
 
 
 class IWListParserTest(TestCase):

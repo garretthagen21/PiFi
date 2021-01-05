@@ -3,9 +3,9 @@ from __future__ import division
 import re
 import textwrap
 
-import wpa-pyfi.subprocess_compat as subprocess
-from wpa-pyfi.utils import db2dbm
-from wpa-pyfi.exceptions import InterfaceError
+import wpa_pyfi.subprocess_compat as subprocess
+from wpa_pyfi.utils import db2dbm
+from wpa_pyfi.exceptions import InterfaceError
 
 
 class Cell(object):
