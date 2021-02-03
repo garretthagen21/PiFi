@@ -51,10 +51,10 @@ class Network(object):
 
     @property
     def priority(self):
-        priority = int(self.opts.get("priority"))
+        priority = self.opts.get("priority")
         if priority is None:
             priority = 0
-        return priority
+        return int(priority)
 
     def set_interface(self, interface):
         self.interface = interface
@@ -302,6 +302,7 @@ class Network(object):
         # Add option params
         network.set_interface(interface)
         network.add_option("key_mgmt", key_mgmt_type)
+        network.add_option("priority", 0)
         if id_str:
             network.add_option("id_str", '"{}"'.format(id_str))
 

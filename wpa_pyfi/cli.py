@@ -49,7 +49,7 @@ def scan_command(args):
 
 def list_command(args):
     for network in Network.for_file(args.file).all():
-        print(network.ssid)
+        print(network)
 
 
 def show_command(args):
@@ -131,19 +131,19 @@ def arg_parser():
 
     parser_show = subparsers.add_parser('config', help="Dry run print the configuration to connect to a new network.")
     parser_show.add_argument('ssid', help=ssid_help, metavar='SSID')
-    parser_show.add_argument('netname', help=network_help, metavar='NETNAME', default=None)
+    parser_show.add_argument('netname', help=network_help, metavar='NETNAME', nargs='?', default=None)
     parser_show.set_defaults(func=show_command)
 
     parser_add = subparsers.add_parser('add',
                                        help="Adds the configuration to connect to a new network.")
     parser_add.add_argument('ssid', help=ssid_help, metavar='SSID')
-    parser_add.add_argument('netname', help=network_help, metavar='NETNAME', default=None)
+    parser_add.add_argument('netname', help=network_help, metavar='NETNAME', nargs='?', default=None)
     parser_add.set_defaults(func=add_command)
 
     parser_delete = subparsers.add_parser('delete',
                                           help="Deletes a network that is currently configured.")
     parser_delete.add_argument('ssid', help=ssid_help, metavar='SSID')
-    parser_delete.add_argument('netname', help=network_help, metavar='NETNAME', default=None)
+    parser_delete.add_argument('netname', help=network_help, metavar='NETNAME', nargs='?', default=None)
     parser_delete.set_defaults(func=delete_command)
 
     parser_connect = subparsers.add_parser('connect',
@@ -153,7 +153,7 @@ def arg_parser():
                                 metavar='SSID')
     parser_connect.add_argument('netname',
                                 help="The nickname of the network to which you wish to connect.",
-                                metavar='NETNAME', default=None)
+                                metavar='NETNAME', nargs='?', default=None)
     parser_connect.set_defaults(func=connect_command)
 
     parser_connect.get_options = lambda: [network.ssid for network in Network.all()]
