@@ -168,7 +168,7 @@ class Network(object):
         """
 
         # Adjust our priority to be the highest
-        self.add_option('priority', max(self.all(),key=attrgetter('priority')).priority + 1)
+        self.add_option('priority', max(self.all(), key=attrgetter('priority')).priority + 1)
 
         # Update supplicant file with our new priority
         self.save(overwrite=True)
@@ -205,13 +205,14 @@ class Network(object):
         # Reorder the existing networks
         all_networks = cls.all().sort(key=attrgetter('priority'))
         network_num = 0
-        for network in all_networks:
-            network.add_option("priority", network_num)
-            network.save()
-            # Only increment priority for non-ambiguous networks
-            if network.priority > 0:
-                network_num += 1
-
+        if all_networks:
+            for network in all_networks:
+                print("Network: "+network.ssid+" Priority: ("+str(network.priority)+" -> "+str(network_num)+")")
+                network.add_option("priority", network_num)
+                network.save()
+                # Only increment priority for non-ambiguous networks
+                if network.priority > 0:
+                    network_num += 1
 
     @classmethod
     def from_string(cls, string):
@@ -305,7 +306,6 @@ class Network(object):
         network.add_option("priority", 0)
         if id_str:
             network.add_option("id_str", '"{}"'.format(id_str))
-
 
         return network
 
