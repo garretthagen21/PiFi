@@ -152,7 +152,7 @@ class Network(object):
 
             # Reload wpa client in case we deleted the network we were connected to
             if disconnect_immediately:
-                self._reload_wpa_client()
+                self._reload_wpa_client(reconfigure_priority=False)
 
             return True
         else:
@@ -178,8 +178,8 @@ class Network(object):
             raise ConnectionError("An error occured during wpa_cli reconfigure %r\n\nwpa_cli Output:" + output % self)
 
     def get_connection_data(self):
-        ifconfig_output_bytes = subprocess.check_output(['ifconfig']).encode('utf-8')
-
+        ifconfig_output_bytes = subprocess.check_output(['ifconfig'])
+        print(ifconfig_output_bytes)
         try:
             ifconfig_parse = IfconfigParser(console_output=ifconfig_output_bytes)
             return ifconfig_parse.get_interface(self.interface)
@@ -203,7 +203,7 @@ class Network(object):
     def reconfigure_priority(cls):
         """Re adjust the priorities in the supplicant file so they are continously ranked"""
         # Reorder the existing networks
-        all_networks = sorted(cls.all(),key=attrgetter('priority'))
+        all_networks = sorted(cls.all(), key=attrgetter('priority'))
         network_num = 0
         for network in all_networks:
 
@@ -216,8 +216,7 @@ class Network(object):
             network.save()
 
             # Only increment priority for non-ambiguous networks
-            if old_priority > 0:
-                network_num += 1
+            network_num += 1
 
     @classmethod
     def from_string(cls, string):
