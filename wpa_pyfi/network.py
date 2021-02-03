@@ -178,10 +178,9 @@ class Network(object):
             raise ConnectionError("An error occured during wpa_cli reconfigure %r\n\nwpa_cli Output:" + output % self)
 
     def get_connection_data(self):
-        ifconfig_output_bytes = subprocess.check_output(['ifconfig'])
-        print(ifconfig_output_bytes)
+        ifconfig_output = str(subprocess.check_output(['ifconfig']))
         try:
-            ifconfig_parse = IfconfigParser(console_output=ifconfig_output_bytes)
+            ifconfig_parse = IfconfigParser(console_output=ifconfig_output)
             return ifconfig_parse.get_interface(self.interface)
         except Exception as e:
             print("An error occured looking for interface: " + self.interface)
@@ -216,7 +215,8 @@ class Network(object):
             network.save()
 
             # Only increment priority for non-ambiguous networks
-            network_num += 1
+            if old_priority > 0:
+                network_num += 1
 
     @classmethod
     def from_string(cls, string):
