@@ -178,10 +178,10 @@ class Network(object):
             raise ConnectionError("An error occured during wpa_cli reconfigure %r\n\nwpa_cli Output:" + output % self)
 
     def get_connection_data(self):
-        ifconfig_output = subprocess.check_output(['ifconfig'])
+        ifconfig_output_bytes = subprocess.check_output(['ifconfig']).encode('utf-8')
 
         try:
-            ifconfig_parse = IfconfigParser(console_output=ifconfig_output)
+            ifconfig_parse = IfconfigParser(console_output=ifconfig_output_bytes)
             return ifconfig_parse.get_interface(self.interface)
         except Exception as e:
             print("An error occured looking for interface: " + self.interface)
