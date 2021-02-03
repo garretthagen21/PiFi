@@ -203,7 +203,7 @@ class Network(object):
     def reconfigure_priority(cls):
         """Re adjust the priorities in the supplicant file so they are continously ranked"""
         # Reorder the existing networks
-        all_networks = cls.all().sort(key=attrgetter('priority'))
+        all_networks = sorted(cls.all(),key=attrgetter('priority'))
         network_num = 0
         for network in all_networks:
             print("Network: "+network.ssid+" Priority: ("+str(network.priority)+" -> "+str(network_num)+")")
