@@ -205,14 +205,13 @@ class Network(object):
         # Reorder the existing networks
         all_networks = cls.all().sort(key=attrgetter('priority'))
         network_num = 0
-        if all_networks:
-            for network in all_networks:
-                print("Network: "+network.ssid+" Priority: ("+str(network.priority)+" -> "+str(network_num)+")")
-                network.add_option("priority", network_num)
-                network.save()
-                # Only increment priority for non-ambiguous networks
-                if network.priority > 0:
-                    network_num += 1
+        for network in all_networks:
+            print("Network: "+network.ssid+" Priority: ("+str(network.priority)+" -> "+str(network_num)+")")
+            network.add_option("priority", network_num)
+            network.save()
+            # Only increment priority for non-ambiguous networks
+            if network.priority > 0:
+                network_num += 1
 
     @classmethod
     def from_string(cls, string):
