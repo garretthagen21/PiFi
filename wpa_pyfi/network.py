@@ -12,6 +12,7 @@
 
 import subprocess
 from ifconfigparser import IfconfigParser
+from operator import attrgetter
 
 
 class Network(object):
@@ -47,6 +48,13 @@ class Network(object):
     @property
     def nickname(self):
         return self.opts.get("id_str")
+
+    @property
+    def priority(self):
+        priority = int(self.opts.get("priority"))
+        if priority is None:
+            priority = 0
+        return priority
 
     def set_interface(self, interface):
         self.interface = interface
@@ -88,7 +96,8 @@ class Network(object):
         """
 
         # Set to default config if unspecified
-        if not supplicant_file: supplicant_file = self.WPA_SUPPLICANT_CONFIG
+        if not supplicant_file:
+            supplicant_file = self.WPA_SUPPLICANT_CONFIG
 
         # Read in the contents of supplicant conf
         file_in = open(supplicant_file, 'r')
@@ -153,13 +162,16 @@ class Network(object):
     def add_option(self, option_key, option_value):
         self.opts[option_key] = option_value
 
-    def activate(self, save_first=True):
+    def activate(self):
         """
         Connects to the network as configured in this scheme.
         """
-        # Save file if it does not exist
-        if save_first:
-            self.save(overwrite=True)
+
+        # Adjust our priority to be the highest
+        self.add_option('priority', max(self.all(),key=attrgetter('priority')).priority + 1)
+
+        # Update supplicant file with our new priority
+        self.save(overwrite=True)
 
         output = self._reload_wpa_client()
         if 'OK' not in output:
@@ -176,12 +188,30 @@ class Network(object):
             print("Stack trace: " + str(e))
             return None
 
-    def _reload_wpa_client(self):
+    def _reload_wpa_client(self, reconfigure_priority=True):
+        # Normalize priorities in the supplicant file
+        if reconfigure_priority:
+            self.reconfigure_priority()
+
         # Restart connection management
         subprocess.check_output(['ifconfig', self.interface, 'up'])
         wpa_cli_output = subprocess.check_output(['wpa_cli', '-i', self.interface, 'reconfigure'],
                                                  stderr=subprocess.STDOUT).decode('utf-8')
         return wpa_cli_output
+
+    @classmethod
+    def reconfigure_priority(cls):
+        """Re adjust the priorities in the supplicant file so they are continously ranked"""
+        # Reorder the existing networks
+        all_networks = cls.all().sort(key=attrgetter('priority'))
+        network_num = 0
+        for network in all_networks:
+            network.add_option("priority", network_num)
+            network.save()
+            # Only increment priority for non-ambiguous networks
+            if network.priority > 0:
+                network_num += 1
+
 
     @classmethod
     def from_string(cls, string):
@@ -252,10 +282,12 @@ class Network(object):
                 nb = "\n".join(netblock)
                 networks.append(cls.from_string(nb))
                 netblock = []
+
         return networks
 
+    # TODO: Priority should be configured so the new network can be set as highest priority in exisiting
     @classmethod
-    def new_network(cls, ssid, passkey="", is_open=False, id_str=None, priority=None, interface=DEFAULT_INTERFACE):
+    def new_network(cls, ssid, passkey="", is_open=False, id_str=None, interface=DEFAULT_INTERFACE):
         network = cls(ssid)
 
         key_mgmt_type = "NONE"
@@ -272,12 +304,11 @@ class Network(object):
         network.add_option("key_mgmt", key_mgmt_type)
         if id_str:
             network.add_option("id_str", '"{}"'.format(id_str))
-        if priority:
-            network.add_option("priority", priority)
+
 
         return network
 
     @classmethod
-    def for_cell(cls, cell, passkey="", id_str="", priority=None, interface=DEFAULT_INTERFACE):
+    def for_cell(cls, cell, passkey="", id_str="", interface=DEFAULT_INTERFACE):
         return cls.new_network(cell.ssid, passkey=passkey, is_open=(not cell.encrypted), id_str=id_str,
-                               priority=priority, interface=interface)
+                               interface=interface)

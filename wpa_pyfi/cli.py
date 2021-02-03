@@ -67,7 +67,7 @@ def add_command(args):
 
 def connect_command(args):
     network_class = Network.for_file(args.file)
-    network = network_class.find(args.ssid, args.netname)
+    network = network_class.find(ssid=args.ssid, name=args.netname)
     assert network, "Couldn't find a Network Named {0!r}, did you mean to use -a?".format(args.ssid)
 
     try:
