@@ -1,6 +1,15 @@
 Changelog
 =========
 
+0.5.1
+^^^^^
+:release-date: 2021-02-03
+
+- Add automatic priority management so activated networks will connect (fix ambiguity bug)
+- Remove explicit priority specification on network creation
+- Fix parsing bug that would cause connection data retrieval to fail for network
+- Make NETNAME parameter optional in CLI arguments
+
 0.5.0
 ^^^^^
 :release-date: 2021-01-04

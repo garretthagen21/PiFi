@@ -208,7 +208,7 @@ class Network(object):
 
             old_priority = network.priority
 
-            print("Network: "+network.ssid+" Priority: ("+str(old_priority)+" -> "+str(network_num)+")")
+            # print("Network: "+network.ssid+" Priority: ("+str(old_priority)+" -> "+str(network_num)+")")
 
             # Update the networks priority
             network.add_option("priority", network_num)
