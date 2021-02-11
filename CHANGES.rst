@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.5.2
+^^^^^
+:release-date: 2021-02-10
+
+- There was an issue in 0.5.1 that prevented pip install. PyPi will not let me overwrite/remove it so it is being fixed in this release
+
 0.5.1
 ^^^^^
 :release-date: 2021-02-03
