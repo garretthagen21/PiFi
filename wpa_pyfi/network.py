@@ -178,7 +178,7 @@ class Network(object):
             raise ConnectionError("An error occured during wpa_cli reconfigure %r\n\nwpa_cli Output:" + output % self)
 
     def get_connection_data(self):
-        ifconfig_output = str(subprocess.check_output(['ifconfig']))
+        ifconfig_output = subprocess.check_output(['ifconfig']).decode('utf-8')
         try:
             ifconfig_parse = IfconfigParser(console_output=ifconfig_output)
             return ifconfig_parse.get_interface(self.interface)

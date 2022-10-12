@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.5.3
+^^^^^
+:release-date: unknown
+
+- Fixed wrong conversion from bytes to str for Python 3.x. str(b'') doesn't return "" but "b''". Now using bytes.decode instead.
+
 0.5.2
 ^^^^^
 :release-date: 2021-02-10
