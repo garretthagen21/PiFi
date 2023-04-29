@@ -5,7 +5,7 @@ import sys
 
 __doc__ = """Command line tool and library wrapper around '/etc/wpa_supplicant/wpa_supplicant.conf'"""
 
-version = '0.5.2'
+version = '0.5.3'
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
@@ -73,6 +73,7 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
     ],
     data_files=data_files
 )
